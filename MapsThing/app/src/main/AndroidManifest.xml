@@ -20,7 +20,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:name="android.support.multidex.MultiDexApplication">
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -32,7 +33,7 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+            android:value="AIzaSyBiVsOe0aCzaLOiGiZ11_0x_s9eBYqku6E" />
 
         <activity
             android:name=".MapsActivity"
