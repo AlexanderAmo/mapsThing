@@ -7,10 +7,22 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="386dp"
+        android:layout_height="46dp">
 
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="change"
+            android:id="@+id/button_changeView"
+            android:onClick="switchViews" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Button"
+            android:id="@+id/button2" />
     </LinearLayout>
 
 
@@ -33,4 +45,5 @@
     android:layout_height="match_parent"
     tools:context="com.example.amoa1000.mapsthing.MapsActivity"
     tools:layout="@layout/abc_action_bar_title_item" />
+
 </LinearLayout>
