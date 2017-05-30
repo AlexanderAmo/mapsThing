@@ -14,15 +14,15 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="change"
+            android:text="view"
             android:id="@+id/button_changeView"
             android:onClick="switchViews" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New Button"
-            android:id="@+id/button2" />
+            android:text="track"
+            android:id="@+id/button_track" />
     </LinearLayout>
 
 

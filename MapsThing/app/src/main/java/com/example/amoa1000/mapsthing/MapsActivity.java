@@ -3,11 +3,14 @@ package com.example.amoa1000.mapsthing;
 import android.*;
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -20,6 +23,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private int switchtheviewofthemap = 0;
+    private LocationManager locationManager;
+    private boolean isGPSenabled = false;
+    private  boolean isNetworkEnabled = false;
+    private boolean canGetLocation;
+    private static final long MIN_TIME_BW_UPDATES = 1000*15*1;
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,12 +62,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         if(ActivityCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
-            Log.d("MyMapApp", "failed permission check 1");
-            Log.d("MyMapApp", Integer.toString(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)));
+            Log.d("myMaps", "failed permission check 1");
+            Log.d("myMaps", Integer.toString(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)));
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},2);
         }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            Log.d("MyMapApp", "failed permission check 2");
+            Log.d("myMaps", "failed permission check 2");
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},2);
         }
 
@@ -71,20 +80,62 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
             switchtheviewofthemap = 1;
         }
-        else if(switchtheviewofthemap == 1){
+        else if(switchtheviewofthemap == 1) {
             mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-            switchtheviewofthemap = 2;
-
-        }
-        else if(switchtheviewofthemap == 2){
-            mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-            switchtheviewofthemap = 3;
-
-        }
-        else if(switchtheviewofthemap == 3) {
-            mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
             switchtheviewofthemap = 0;
 
         }
     }
+    public void trackMeBB(View v){
+
+    }
+
+    public void getLocation(){
+
+        try {
+            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+            //get gps status
+            isGPSenabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            if(isGPSenabled) Log.d("myMaps", "gps is enabled, probably ");
+
+            isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            if(isNetworkEnabled) Log.d("myMaps", "network is enabled, probably ");
+
+            if(!isGPSenabled && !isNetworkEnabled){
+                Log.d("myMaps","no provider mate");
+            } else{
+                this.canGetLocation = true;
+                if(isNetworkEnabled){
+                    Log.d("myMaps","getLocation for network is enabled bro, you should go request location updates");
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                            MIN_TIME_BW_UPDATES,
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES,
+                            locationListenerNetwork);
+
+                    Log.d("myMaps", "the getlocation thing has done stuff. specifically the network update request was successful");
+                    Toast.makeText(this,"using Network",Toast.LENGTH_SHORT);
+                }
+                if(isGPSenabled){
+                    Log.d("myMaps","getLocation for GPS is enabled bro, you should go request location updates");
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                            MIN_TIME_BW_UPDATES,
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES,
+                            locationListenerGPS);
+
+                    Log.d("myMaps", "the getlocation thing has done stuff. specifically the GPS update request was successful");
+                    Toast.makeText(this,"using GPS",Toast.LENGTH_SHORT);
+                }
+
+
+            }
+
+
+
+        }catch (Exception e){
+            Log.d("myMaps", "god danmit getLocation");
+            e.printStackTrace();
+        }
+    }
+
 }
