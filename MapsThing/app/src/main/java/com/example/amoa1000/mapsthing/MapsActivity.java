@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -159,6 +161,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         public void onLocationChanged(Location location) {
             dropMarker(location.getProvider());
 
+
         }
 
         @Override
@@ -176,30 +179,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         }
     };
-    android.location.LocationListener locationListenerGps = new android.location.LocationListener() {
-        @Override
+    LocationListener locationListenerGps = new LocationListener() {
+
         public void onLocationChanged(Location location) {
 
             dropMarker(location.getProvider());
 
+            try{
+                locationManager.removeUpdates(locationListenerNetwork);
+            } catch(SecurityException e){
+
+            }
+
         }
 
-        @Override
+
         public void onStatusChanged(String provider, int status, Bundle extras) {
 
-            //when network change from gps to wifi
-            //
+            switch(status){
+                case LocationProvider.AVAILABLE:
+                    Log.d("Status", "Location Provider is Available");
+                    break;
+                case LocationProvider.OUT_OF_SERVICE:
+                    Log.d("Status", "Location Provider isn't available");
+                    try {
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListenerNetwork);
+                    }catch(SecurityException e){
 
+                    }
+                    break;
+                case LocationProvider.TEMPORARILY_UNAVAILABLE:
+                    Log.d("Status","Location Provider is temporarily unavailable");
+                    break;
+                default:
+                    try{
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, locationListenerNetwork);
+                    }catch(SecurityException e){
+
+                    }
+            }
         }
 
-        @Override
         public void onProviderEnabled(String provider) {
-
         }
-
-        @Override
         public void onProviderDisabled(String provider) {
-
         }
     };
 
