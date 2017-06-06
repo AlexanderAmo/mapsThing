@@ -4,6 +4,7 @@ import android.*;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationProvider;
@@ -12,8 +13,10 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.identity.intents.Address;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -23,7 +26,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -39,10 +47,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Location myLocation;
     private LatLng userlocation = null;
     private static final int MY_LOC_ZOOM_FACTOR = 15;
+    EditText Search;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
+        Search = (EditText) findViewById(R.id.editText_search);
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -95,13 +109,71 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         }
     }
-    public void StopGettingLocation(){
-        
+
+    public void search(View v){
+        Log.d("search","atleast the button works");
+        Geocoder POI = new Geocoder(this, Locale.getDefault());
+        Log.d("search","innitiated the geocoder thing");
+        String whatAmIsearchingFor = Search.getText().toString();
+        Log.d("search","made the text from the search to a string");
+        try {
+
+            List<android.location.Address> life = POI.getFromLocationName(whatAmIsearchingFor,10);
+
+            for(android.location.Address locations: life){
+
+                LatLng NewLocation = new LatLng(locations.getLongitude(),locations.getLatitude());
+
+                Marker marker = mMap.addMarker(new MarkerOptions().position(NewLocation).title(whatAmIsearchingFor));
+
+                Log.d("myMaps","added a location for what you searched for");
+            }
+
+
+        } catch (IOException e) {
+            Log.d("myMaps","problem with the search function");
+        }
+
 
     }
 
 
-    public void getLocation(View v) {
+
+
+
+    public void toggleTracking(View v){
+        if(track == 0){
+            getLocation();
+            track = 1;
+        }else if(track == 1){
+            StopGettingLocation();
+            track = 0;
+        }
+    }
+
+    public void clearMarkers(View v){
+        mMap.clear();
+    }
+
+    public void StopGettingLocation() {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationManager.removeUpdates(locationListenerGps);
+        locationManager.removeUpdates(locationListenerNetwork);
+        locationManager = null;
+
+    }
+
+    public void getLocation() {
 
         try {
             locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
