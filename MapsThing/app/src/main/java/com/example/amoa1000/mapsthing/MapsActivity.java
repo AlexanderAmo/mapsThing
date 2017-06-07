@@ -36,29 +36,35 @@ import java.util.Locale;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+
     private int switchtheviewofthemap = 0;
+
     private int track = 0;
     private LocationManager locationManager;
+
     private boolean isGPSenabled = false;
     private boolean isNetworkEnabled = false;
+
     private boolean canGetLocation;
+
     private static final long MIN_TIME_BW_UPDATES = 1000 * 15 * 1;
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 5;
+
     private Location myLocation;
     private LatLng userlocation = null;
+
     private static final int MY_LOC_ZOOM_FACTOR = 15;
+
     EditText Search;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
-        Search = (EditText) findViewById(R.id.editText_search);
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        Search = (EditText) findViewById(R.id.editText_Search);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -111,22 +117,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void search(View v){
-        Log.d("search","atleast the button works");
-        Geocoder POI = new Geocoder(this, Locale.getDefault());
-        Log.d("search","innitiated the geocoder thing");
-        String whatAmIsearchingFor = Search.getText().toString();
-        Log.d("search","made the text from the search to a string");
-        try {
+        Log.d("search1",Search.getText().toString());
 
-            List<android.location.Address> life = POI.getFromLocationName(whatAmIsearchingFor,10);
+        Log.d("search1","atleast the button works");
+
+        Geocoder POI = new Geocoder(this, Locale.getDefault());
+        Log.d("search1","innitiated the geocoder thing");
+
+        try {
+            Log.d("search1","got into the try/catch");
+
+            List<android.location.Address> life = POI.getFromLocationName(Search.getText().toString(),10);
+            Log.d("search1","it sets up the list for the search");
 
             for(android.location.Address locations: life){
 
-                LatLng NewLocation = new LatLng(locations.getLongitude(),locations.getLatitude());
+                LatLng SearchLocation = new LatLng(locations.getLatitude(),locations.getLongitude());
 
-                Marker marker = mMap.addMarker(new MarkerOptions().position(NewLocation).title(whatAmIsearchingFor));
+                Marker marker = mMap.addMarker(new MarkerOptions().position(SearchLocation).title(Search.getText().toString()));
 
-                Log.d("myMaps","added a location for what you searched for");
+
             }
 
 
