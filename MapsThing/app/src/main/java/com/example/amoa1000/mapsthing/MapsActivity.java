@@ -116,19 +116,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    public void search(View v){
-        Log.d("search1",Search.getText().toString());
 
-        Log.d("search1","atleast the button works");
+    public double longitude(Location location) {
+        Log.d("search1", location.getLatitude() + "");
+        return location.getLongitude();
+    }
+
+    public double latitude(Location location) {
+
+        Log.d("search1", location.getLatitude() + "");
+        return location.getLatitude();
+
+    }
+
+    public void search(View v) {
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                MIN_TIME_BW_UPDATES,
+                MIN_DISTANCE_CHANGE_FOR_UPDATES,
+                locationListenerSearch);
+        Location idk = new Location(String.valueOf(this));
 
         Geocoder POI = new Geocoder(this, Locale.getDefault());
         Log.d("search1","innitiated the geocoder thing");
 
+        mMap.clear();
         try {
             Log.d("search1","got into the try/catch");
 
-            List<android.location.Address> life = POI.getFromLocationName(Search.getText().toString(),10);
-            Log.d("search1","it sets up the list for the search");
+           List<android.location.Address> life = POI.getFromLocationName(Search.getText().toString(),10);
 
             for(android.location.Address locations: life){
 
@@ -146,10 +173,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     }
-
-
-
-
 
     public void toggleTracking(View v){
         if(track == 0){
@@ -243,6 +266,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    android.location.LocationListener locationListenerSearch = new android.location.LocationListener(){
+        @Override
+        public void onLocationChanged(Location location) {
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+        }
+    };
     android.location.LocationListener locationListenerNetwork = new android.location.LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
